@@ -1,0 +1,63 @@
+# Author Tolga C
+# This file contains 5 mistakes 
+# Business understanding 
+
+# Data understanding 
+# We need to start deciding and predicting from the patients' data whether someone has and or will get diabetes 
+
+# packages 
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix
+
+
+#importing dataset
+url = "https://raw.githubusercontent.com/HAN-M3DM-Data-Mining/data-mining-s2y2223-Mzakhimi/master/datasets/KNN-diabetes.csv"
+RawDF = pd.read_(url)
+
+#Data preparation
+# count the amount and turn it into percentage
+cntDiag = RawDF['Outcome'].value_counts()
+propDiag = RawDF['Outcome'].value_counts(normalize=True)
+cntDiag
+propDiag
+
+# we pick 3 different measurements for model
+RawDF[['BMI', 'DiabetesPedigreeFunction', 'BloodPressure']].describe()
+
+#normalize function
+def normalize(x):
+  return((x - min(x)) / (max(x) - min(x)))
+
+# Datamodeling 
+testSet1 = np.arange(1,6)
+testSet2 = np.arange(1,6) * 10
+
+print(f'testSet1: {testSet1}\n') 
+print(f'testSet1: {testSet1}\n')
+print(f'Normalized testSet1: {normalize(testSet1)}\n')
+print(f'Normalized testSet2: {normalize(testSet2)}\n')
+
+### Apply to all numeric variables in the dataframe
+
+excluded = ['Outcome']
+X = RawDF.loc[:, ~RawDF.columns.isin(excluded)]
+X = X.apply(normalize, axis=0)
+X[['BMI', 'DiabetesPedigreeFunction', 'BloodPressure']].describe()
+
+
+z = RawDF['Outcome']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=123, stratify=y)
+
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+
+y_pred = knn.predict(X_test)
+
+# Data evalutation
+cm = confusion_matrix(y_test, y_pred, labels=knn.classes_)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=knn.classes_)
+disp.plot()
+plt.show()
